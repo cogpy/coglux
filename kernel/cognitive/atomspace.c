@@ -35,7 +35,7 @@ int __init atomspace_init(void)
     
     /* Create memory cache for atoms */
     atom_cache = kmem_cache_create("cognitive_atoms",
-                                   sizeof(struct atom) + 256,  /* Base size + data */
+                                   ATOM_CACHE_SIZE,  /* Base size + data */
                                    0, SLAB_HWCACHE_ALIGN, NULL);
     if (!atom_cache) {
         pr_err("cognitive: Failed to create atom cache\n");
@@ -88,7 +88,7 @@ struct atom *atom_create(enum atom_type type, const char *data, size_t len)
     struct rb_node **link, *parent = NULL;
     u64 uuid;
     
-    if (len > 256) {  /* Limit atom data size */
+    if (len > ATOM_MAX_DATA_SIZE) {  /* Limit atom data size */
         return NULL;
     }
     
@@ -232,30 +232,31 @@ int atom_link(struct atom *from, struct atom *to)
 struct atom *atomspace_query(const char *pattern)
 {
     struct rb_node *node;
-    struct atom *atom;
+    struct atom *atom, *result = NULL;
     
     if (!pattern) {
         return NULL;
     }
     
-    /* Simple linear search - in a full implementation this would
-     * use indexed pattern matching for efficiency */
+    /* Take lock once for the entire search */
     spin_lock(&kernel_atomspace.lock);
     
+    /* Simple linear search - in a full implementation this would
+     * use indexed pattern matching for efficiency */
     for (node = rb_first(&kernel_atomspace.atoms); node; node = rb_next(node)) {
         atom = rb_entry(node, struct atom, node);
         
-        /* Simple string matching for now */
-        if (atom->data_len > 0 && 
-            strstr(atom->data, pattern) != NULL) {
+        /* Simple string matching - check data exists and matches */
+        if (atom->data_len > 0 && atom->data_len >= strlen(pattern) &&
+            memcmp(atom->data, pattern, strlen(pattern)) == 0) {
             atomic_inc(&atom->ref_count);
-            spin_unlock(&kernel_atomspace.lock);
-            return atom;
+            result = atom;
+            break;  /* Return first match */
         }
     }
     
     spin_unlock(&kernel_atomspace.lock);
-    return NULL;
+    return result;
 }
 
 /**

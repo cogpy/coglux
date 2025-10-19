@@ -34,7 +34,7 @@ SYSCALL_DEFINE3(cognitive_atom_create, int, type, const char __user *, data, siz
     struct atom *atom;
     char *kernel_data;
     
-    if (len > 256 || !data) {
+    if (len > ATOM_MAX_DATA_SIZE || !data) {
         return -EINVAL;
     }
     
@@ -79,8 +79,8 @@ SYSCALL_DEFINE2(cognitive_atom_query, const char __user *, pattern, u64 __user *
     }
     
     /* Get pattern length */
-    len = strnlen_user(pattern, 256);
-    if (len > 256) {
+    len = strnlen_user(pattern, ATOM_MAX_DATA_SIZE);
+    if (len > ATOM_MAX_DATA_SIZE) {
         return -EINVAL;
     }
     

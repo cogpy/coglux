@@ -12,9 +12,20 @@
 #include <linux/cognitive/sched.h>
 
 /* Forward declarations for optional subsystems */
+#ifdef CONFIG_COGNITIVE_ATOMSPACE
+extern int pattern_engine_init(void);
+extern void pattern_engine_cleanup(void);
+#endif
 #ifdef CONFIG_COGNITIVE_MEMORY
 extern int cognitive_memory_init(void);
 extern void cognitive_memory_cleanup(void);
+#endif
+
+#ifdef CONFIG_COGNITIVE_SCHEDULER
+extern int cognitive_sched_init(void);
+extern void cognitive_sched_cleanup(void);
+extern int cognitive_bpf_sched_init(void);
+extern void cognitive_bpf_sched_cleanup(void);
 #endif
 
 #ifdef CONFIG_COGNITIVE_DEBUG
@@ -38,6 +49,14 @@ static int __init cognitive_init(void)
         pr_err("cognitive: Failed to initialize AtomSpace: %d\n", ret);
         return ret;
     }
+    
+    /* Initialize pattern engine */
+    ret = pattern_engine_init();
+    if (ret) {
+        pr_err("cognitive: Failed to initialize pattern engine: %d\n", ret);
+        atomspace_cleanup();
+        return ret;
+    }
 #endif
 
     /* Initialize cognitive scheduler if enabled */
@@ -45,6 +64,14 @@ static int __init cognitive_init(void)
     ret = cognitive_sched_init();
     if (ret) {
         pr_err("cognitive: Failed to initialize cognitive scheduler: %d\n", ret);
+        goto err_sched;
+    }
+    
+    /* Initialize BPF cognitive scheduler */
+    ret = cognitive_bpf_sched_init();
+    if (ret) {
+        pr_err("cognitive: Failed to initialize BPF scheduler: %d\n", ret);
+        cognitive_sched_cleanup();
         goto err_sched;
     }
 #endif
@@ -85,6 +112,7 @@ err_memory:
 #ifdef CONFIG_COGNITIVE_SCHEDULER
 err_sched:
 #ifdef CONFIG_COGNITIVE_ATOMSPACE
+    pattern_engine_cleanup();
     atomspace_cleanup();
 #endif
 #endif
@@ -107,10 +135,12 @@ static void __exit cognitive_exit(void)
 #endif
 
 #ifdef CONFIG_COGNITIVE_SCHEDULER
+    cognitive_bpf_sched_cleanup();
     cognitive_sched_cleanup();
 #endif
 
 #ifdef CONFIG_COGNITIVE_ATOMSPACE
+    pattern_engine_cleanup();
     atomspace_cleanup();
 #endif
 
