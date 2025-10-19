@@ -189,3 +189,5 @@ config SCHED_CLASS_EXT
 	  For more information:
 	    Documentation/scheduler/sched-ext.rst
 	    https://github.com/sched-ext/scx
+
+source "kernel/cognitive/Kconfig"
