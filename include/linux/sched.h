@@ -62,6 +62,7 @@ struct bpf_run_ctx;
 struct bpf_net_context;
 struct capture_control;
 struct cfs_rq;
+struct cognitive_task;
 struct fs_struct;
 struct futex_pi_state;
 struct io_context;
@@ -1655,6 +1656,11 @@ struct task_struct {
 
 #ifdef CONFIG_UNWIND_USER
 	struct unwind_task_info		unwind_info;
+#endif
+
+#ifdef CONFIG_COGNITIVE_KERNEL
+	/* Cognitive attributes for AGI-OS cognitive kernel */
+	struct cognitive_task		*cognitive_attrs;
 #endif
 
 	/* CPU-specific state of this task: */
