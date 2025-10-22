@@ -33,6 +33,7 @@ enum atom_type {
 #define ATOM_MAX_UUID         (1ULL << 60)  /* Maximum atom UUID */
 #define ATOM_CACHE_SIZE       (sizeof(struct atom) + ATOM_MAX_DATA_SIZE)
 /* Truth value representation for uncertain reasoning */
+struct truth_value {
     float strength;   /* Probability/confidence [0.0, 1.0] */
     float confidence; /* Reliability of strength [0.0, 1.0] */
 };
