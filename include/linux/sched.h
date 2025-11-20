@@ -89,6 +89,10 @@ struct task_group;
 struct task_struct;
 struct user_event_mm;
 
+#ifdef CONFIG_COGNITIVE_KERNEL
+struct cognitive_task;
+#endif
+
 #include <linux/sched/ext.h>
 
 /*
@@ -1670,6 +1674,12 @@ struct task_struct {
 	 * New fields for task_struct should be added above here, so that
 	 * they are included in the randomized portion of task_struct.
 	 */
+
+#ifdef CONFIG_COGNITIVE_KERNEL
+	/* Cognitive computing attributes for AGI-OS */
+	struct cognitive_task		*cognitive_attrs;
+#endif
+
 	randomized_struct_fields_end
 } __attribute__ ((aligned (64)));
 
