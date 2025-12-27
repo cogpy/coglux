@@ -17,6 +17,8 @@ import { generateElementaryDifferentials } from './a000081';
 
 /**
  * Generate unique kernel ID
+ * Note: Uses timestamp + random for simplicity. For production use,
+ * consider crypto.randomUUID() or a proper UUID library.
  */
 function generateKernelId(): string {
   return `kernel_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;

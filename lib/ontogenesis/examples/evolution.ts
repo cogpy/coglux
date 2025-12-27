@@ -40,7 +40,7 @@ console.log(`  Seed kernels: ${config.seedKernels.length}\n`);
 
 // Run evolution
 console.log('Starting evolution...\n');
-const result = runOntogenesis(config);
+const result = runOntogenesis(config, true); // Enable verbose output
 
 // Analyze results
 console.log('\n=== Evolution Results ===\n');

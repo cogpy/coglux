@@ -175,11 +175,15 @@ function calculateGenerationStats(
 
 /**
  * Run ontogenesis: evolve population over multiple generations
+ * @param config Evolution configuration
+ * @param verbose Enable console logging (default: false)
  */
-export function runOntogenesis(config: OntogenesisConfig): EvolutionResult {
-  console.log('Starting ontogenesis evolution...');
-  console.log(`Population size: ${config.evolution.populationSize}`);
-  console.log(`Max generations: ${config.evolution.maxGenerations}`);
+export function runOntogenesis(config: OntogenesisConfig, verbose: boolean = false): EvolutionResult {
+  if (verbose) {
+    console.log('Starting ontogenesis evolution...');
+    console.log(`Population size: ${config.evolution.populationSize}`);
+    console.log(`Max generations: ${config.evolution.maxGenerations}`);
+  }
   
   // Initialize population
   let population = initializePopulation(config);
@@ -192,17 +196,21 @@ export function runOntogenesis(config: OntogenesisConfig): EvolutionResult {
     const stats = calculateGenerationStats(population, gen);
     generationStats.push(stats);
     
-    console.log(
-      `Generation ${gen}: ` +
-      `Best=${stats.bestFitness.toFixed(4)}, ` +
-      `Avg=${stats.averageFitness.toFixed(4)}, ` +
-      `Diversity=${stats.diversity.toFixed(4)}`
-    );
+    if (verbose) {
+      console.log(
+        `Generation ${gen}: ` +
+        `Best=${stats.bestFitness.toFixed(4)}, ` +
+        `Avg=${stats.averageFitness.toFixed(4)}, ` +
+        `Diversity=${stats.diversity.toFixed(4)}`
+      );
+    }
     
     // Check convergence
     if (stats.bestFitness >= config.evolution.fitnessThreshold) {
       convergenceGeneration = gen;
-      console.log(`Converged at generation ${gen}!`);
+      if (verbose) {
+        console.log(`Converged at generation ${gen}!`);
+      }
       break;
     }
     
@@ -214,9 +222,11 @@ export function runOntogenesis(config: OntogenesisConfig): EvolutionResult {
   const finalGen = generationStats[generationStats.length - 1].generation;
   const finalStats = calculateGenerationStats(population, finalGen);
   
-  console.log('Evolution complete!');
-  console.log(`Final best fitness: ${finalStats.bestFitness.toFixed(4)}`);
-  console.log(`Total generations: ${generationStats.length}`);
+  if (verbose) {
+    console.log('Evolution complete!');
+    console.log(`Final best fitness: ${finalStats.bestFitness.toFixed(4)}`);
+    console.log(`Total generations: ${generationStats.length}`);
+  }
   
   return {
     generations: generationStats,

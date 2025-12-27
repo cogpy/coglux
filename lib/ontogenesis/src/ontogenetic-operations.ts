@@ -23,6 +23,8 @@ import { calculateGrip } from './universal-kernel-generator';
 
 /**
  * Generate unique genome ID
+ * Note: Uses timestamp + random for simplicity. For production use,
+ * consider crypto.randomUUID() or a proper UUID library.
  */
 function generateGenomeId(): string {
   return `genome_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;

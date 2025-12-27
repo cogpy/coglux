@@ -31,9 +31,12 @@ export function a000081(n: number): number {
     return A000081_SEQUENCE[n];
   }
   
-  // For larger values, use recurrence relation
-  // This is computationally expensive, so we use precomputed values when possible
-  throw new Error(`A000081(${n}) not precomputed. Maximum n is ${A000081_SEQUENCE.length - 1}`);
+  // For larger values, use recurrence relation (computationally expensive)
+  // This is not implemented to avoid performance issues
+  throw new Error(
+    `A000081(${n}) not precomputed. Maximum supported n is ${A000081_SEQUENCE.length - 1}. ` +
+    `Consider using a smaller order value or extending the precomputed sequence.`
+  );
 }
 
 /**
