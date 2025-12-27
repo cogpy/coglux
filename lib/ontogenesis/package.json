@@ -1,0 +1,29 @@
+{
+  "name": "coglux-ontogenesis",
+  "version": "0.1.0",
+  "description": "Self-generating, evolving computational kernels using differential calculus",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "coglux",
+    "ontogenesis",
+    "self-generating",
+    "kernels",
+    "differential-calculus",
+    "evolution",
+    "A000081"
+  ],
+  "author": "CogLux Project",
+  "license": "GPL-2.0",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {}
+}
