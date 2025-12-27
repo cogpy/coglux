@@ -19,7 +19,7 @@ import { generateElementaryDifferentials } from './a000081';
  * Generate unique kernel ID
  */
 function generateKernelId(): string {
-  return `kernel_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `kernel_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 }
 
 /**
