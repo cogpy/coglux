@@ -142,6 +142,9 @@ cat /proc/cognitive/tasks
 - [x] Cognitive memory manager foundation
 - [x] Task structure integration
 - [x] Kernel configuration and build system integration
+- [x] **Ontogenesis framework** - Self-generating, evolving kernels (TypeScript library)
+- [x] **Universal Kernel Generator** - Domain-specific kernel generation via B-series
+- [x] **A000081 implementation** - Rooted trees for elementary differentials
 
 ### Future Enhancements
 - [ ] Advanced pattern indexing for performance
@@ -149,7 +152,8 @@ cat /proc/cognitive/tasks
 - [ ] Machine learning framework integration
 - [ ] Real-time cognitive constraints
 - [ ] Performance benchmarking suite
-- [ ] Documentation and tutorials
+- [ ] Kernel-space ontogenesis integration
+- [ ] Hardware-accelerated kernel evolution
 
 ## Testing
 
@@ -182,6 +186,59 @@ The cognitive kernel is designed for:
 - **Cognitive computing**: Goal-oriented and attention-based computing
 - **Adaptive systems**: Self-modifying and learning system behavior
 - **AGI development**: Foundation for artificial general intelligence systems
+- **Ontogenesis research**: Self-generating and evolving computational kernels
+
+## Ontogenesis: Self-Generating Kernels
+
+CogLux includes a revolutionary **ontogenesis system** that implements living mathematical structures. Computational kernels can:
+
+- **Self-generate**: Create offspring through recursive composition (chain rule)
+- **Self-optimize**: Improve their grip (fit to domain) through iterative optimization
+- **Self-reproduce**: Combine genetic information through crossover and mutation
+- **Evolve**: Populations of kernels evolve over generations to maximize fitness
+
+The ontogenesis system is implemented as a TypeScript library in `lib/ontogenesis/` and uses:
+
+- **B-series expansion**: Universal language for kernel generation
+- **A000081 sequence**: Rooted trees as elementary differentials
+- **Differential operators**: Chain rule, product rule, quotient rule
+- **Genetic algorithms**: Tournament selection, crossover, mutation, elitism
+
+### Quick Example
+
+```typescript
+import { 
+  UniversalKernelGenerator,
+  initializeOntogeneticKernel,
+  selfGenerate,
+  runOntogenesis
+} from 'coglux-ontogenesis';
+
+// Generate consciousness kernel
+const kernel = UniversalKernelGenerator.generateConsciousnessKernel(4);
+
+// Initialize for ontogenesis
+const ontoKernel = initializeOntogeneticKernel(kernel);
+
+// Self-generate offspring
+const offspring = selfGenerate(ontoKernel);
+
+// Evolve population
+const result = runOntogenesis({
+  evolution: {
+    populationSize: 20,
+    mutationRate: 0.15,
+    crossoverRate: 0.8,
+    elitismRate: 0.1,
+    maxGenerations: 50,
+    fitnessThreshold: 0.9,
+    diversityPressure: 0.2
+  },
+  seedKernels: [kernel]
+});
+```
+
+See [Ontogenesis Documentation](./ontogenesis.md) and [Library README](../../lib/ontogenesis/README.md) for details.
 
 ## Contributors
 
