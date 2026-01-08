@@ -1,0 +1,190 @@
+# CogLux CI Pipeline
+# Comprehensive build, test, and quality checks
+name: CogLux CI
+
+on:
+  push:
+    branches: [ main, develop, feature/** ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  # ============================================
+  # Code Quality
+  # ============================================
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck clang-format
+
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=all --inconclusive --std=c++17 \
+            --suppress=missingIncludeSystem \
+            -I include/ \
+            src/ 2>&1 | tee cppcheck-report.txt
+        continue-on-error: true
+
+      - name: Check formatting
+        run: |
+          find src include -name '*.cpp' -o -name '*.hpp' | \
+            xargs clang-format --dry-run --Werror 2>&1 | tee format-report.txt || true
+        continue-on-error: true
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-quality-reports
+          path: |
+            cppcheck-report.txt
+            format-report.txt
+          retention-days: 7
+
+  # ============================================
+  # Linux Build & Test
+  # ============================================
+  linux-build:
+    name: Linux (${{ matrix.compiler }}, ${{ matrix.build_type }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+        build_type: [Release, Debug]
+        include:
+          - compiler: gcc
+            cc: gcc
+            cxx: g++
+          - compiler: clang
+            cc: clang
+            cxx: clang++
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+            -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+            -DBUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type }}
+
+      - name: Run tests
+        working-directory: build
+        run: ctest --build-config ${{ matrix.build_type }} --output-on-failure --timeout 60
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-linux-${{ matrix.compiler }}-${{ matrix.build_type }}
+          path: build/Testing/
+          retention-days: 7
+
+  # ============================================
+  # Windows Build & Test
+  # ============================================
+  windows-build:
+    name: Windows (MSVC, ${{ matrix.build_type }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release, Debug]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} `
+            -DBUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type }}
+
+      - name: Run tests
+        working-directory: build
+        run: ctest --build-config ${{ matrix.build_type }} --output-on-failure --timeout 60
+
+  # ============================================
+  # macOS Build & Test
+  # ============================================
+  macos-build:
+    name: macOS (${{ matrix.build_type }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release, Debug]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: brew install cmake ninja
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DBUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type }}
+
+      - name: Run tests
+        working-directory: build
+        run: ctest --build-config ${{ matrix.build_type }} --output-on-failure --timeout 60
+
+  # ============================================
+  # Integration Summary
+  # ============================================
+  integration:
+    name: Integration Summary
+    runs-on: ubuntu-latest
+    needs: [code-quality, linux-build, windows-build, macos-build]
+    if: always()
+    
+    steps:
+      - name: Check results
+        run: |
+          echo "=== CI Pipeline Summary ==="
+          echo "Code Quality: ${{ needs.code-quality.result }}"
+          echo "Linux Build: ${{ needs.linux-build.result }}"
+          echo "Windows Build: ${{ needs.windows-build.result }}"
+          echo "macOS Build: ${{ needs.macos-build.result }}"
+          
+          if [ "${{ needs.linux-build.result }}" = "failure" ] || \
+             [ "${{ needs.windows-build.result }}" = "failure" ] || \
+             [ "${{ needs.macos-build.result }}" = "failure" ]; then
+            echo "::error::One or more build jobs failed"
+            exit 1
+          fi
+          
+          echo "All builds passed!"
