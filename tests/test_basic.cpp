@@ -17,7 +17,7 @@ int main() {
     assert(init);
     
     // Test node creation
-    auto node = std::make_unique<coglux::SimpleCogNode>("test_node");
+    std::unique_ptr<coglux::SimpleCogNode> node(new coglux::SimpleCogNode("test_node"));
     std::cout << "Node name: " << node->name() << std::endl;
     assert(node->name() == "test_node");
     
@@ -28,8 +28,8 @@ int main() {
     
     // Test graph
     coglux::CogGraph graph;
-    graph.add_node(std::make_unique<coglux::SimpleCogNode>("node1"));
-    graph.add_node(std::make_unique<coglux::SimpleCogNode>("node2"));
+    graph.add_node(std::unique_ptr<coglux::CogNode>(new coglux::SimpleCogNode("node1")));
+    graph.add_node(std::unique_ptr<coglux::CogNode>(new coglux::SimpleCogNode("node2")));
     std::cout << "Graph nodes: " << graph.node_count() << std::endl;
     assert(graph.node_count() == 2);
     

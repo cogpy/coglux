@@ -25,7 +25,7 @@ int test_version() {
 }
 
 int test_node() {
-    auto node = std::make_unique<coglux::SimpleCogNode>("test_node");
+    std::unique_ptr<coglux::SimpleCogNode> node(new coglux::SimpleCogNode("test_node"));
     TEST_ASSERT(node != nullptr, "Node should be created");
     TEST_ASSERT(node->name() == "test_node", "Node name should match");
     TEST_ASSERT(node->process(), "Node should process successfully");
@@ -37,11 +37,11 @@ int test_graph() {
     coglux::CogGraph graph;
     TEST_ASSERT(graph.node_count() == 0, "Empty graph should have 0 nodes");
     
-    graph.add_node(std::make_unique<coglux::SimpleCogNode>("node1"));
+    graph.add_node(std::unique_ptr<coglux::CogNode>(new coglux::SimpleCogNode("node1")));
     TEST_ASSERT(graph.node_count() == 1, "Graph should have 1 node");
     
-    graph.add_node(std::make_unique<coglux::SimpleCogNode>("node2"));
-    graph.add_node(std::make_unique<coglux::SimpleCogNode>("node3"));
+    graph.add_node(std::unique_ptr<coglux::CogNode>(new coglux::SimpleCogNode("node2")));
+    graph.add_node(std::unique_ptr<coglux::CogNode>(new coglux::SimpleCogNode("node3")));
     TEST_ASSERT(graph.node_count() == 3, "Graph should have 3 nodes");
     
     TEST_ASSERT(graph.process_all(), "Graph should process all nodes");

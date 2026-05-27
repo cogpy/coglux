@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 # Find GTest if available
 find_package(GTest QUIET)
 
-if(GTest_FOUND)
+if(GTest_FOUND AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/test_coglux.cpp)
     # GTest-based tests
     add_executable(coglux_tests
         test_coglux.cpp
